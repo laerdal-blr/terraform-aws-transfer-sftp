@@ -92,10 +92,5 @@ variable "identity_provider_lambda_arn" {
   description = "ARN of the AWS Lambda function for identity provider"
   type        = string
   default     = null
-
-  validation {
-    condition     = var.identity_provider_type != "AWS_LAMBDA" || var.identity_provider_lambda_arn != null
-    error_message = "When identity_provider_type is AWS_LAMBDA, identity_provider_lambda_arn must be provided."
-  }
 }
 
