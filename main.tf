@@ -28,7 +28,7 @@ data "aws_s3_bucket" "landing" {
 resource "aws_transfer_server" "default" {
   count = local.enabled ? 1 : 0
 
-  identity_provider_type = "SERVICE_MANAGED"
+  identity_provider_type = var.identity_provider_type
   protocols              = ["SFTP"]
   domain                 = var.domain
   endpoint_type          = local.is_vpc ? "VPC" : "PUBLIC"
@@ -47,11 +47,20 @@ resource "aws_transfer_server" "default" {
     }
   }
 
+  dynamic "identity_provider_details" {
+    for_each = var.identity_provider_type == "AWS_LAMBDA" ? [1] : []
+
+    content {
+      function        = var.identity_provider_lambda_arn
+      invocation_role = var.identity_provider_invocation_role
+    }
+  }
+
   tags = module.this.tags
 }
 
 resource "aws_transfer_user" "default" {
-  for_each = local.enabled ? var.sftp_users : {}
+  for_each = local.enabled && var.identity_provider_type == "SERVICE_MANAGED" ? var.sftp_users : {}
 
   server_id = join("", aws_transfer_server.default[*].id)
   role      = aws_iam_role.s3_access_for_sftp_users[each.value.user_name].arn

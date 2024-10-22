@@ -81,3 +81,32 @@ variable "eip_enabled" {
   description = "Whether to provision and attach an Elastic IP to be used as the SFTP endpoint. An EIP will be provisioned per subnet."
   default     = false
 }
+
+variable "identity_provider_type" {
+  description = "Type of identity provider (e.g., SERVICE_MANAGED, AWS_LAMBDA)"
+  type        = string
+  default     = "SERVICE_MANAGED"
+}
+
+variable "identity_provider_lambda_arn" {
+  description = "ARN of the AWS Lambda function for identity provider"
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.identity_provider_type != "AWS_LAMBDA" || var.identity_provider_lambda_arn != null
+    error_message = "When identity_provider_type is AWS_LAMBDA, identity_provider_lambda_arn must be provided."
+  }
+}
+
+variable "identity_provider_invocation_role" {
+  description = "ARN of the IAM role that AWS Transfer uses to invoke the Lambda function"
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.identity_provider_type != "AWS_LAMBDA" || var.identity_provider_invocation_role != null
+    error_message = "When identity_provider_type is AWS_LAMBDA, identity_provider_invocation_role must be provided."
+  }
+}
+
