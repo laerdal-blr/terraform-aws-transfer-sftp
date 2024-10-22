@@ -51,8 +51,7 @@ resource "aws_transfer_server" "default" {
     for_each = var.identity_provider_type == "AWS_LAMBDA" ? [1] : []
 
     content {
-      function        = var.identity_provider_lambda_arn
-      invocation_role = var.identity_provider_invocation_role
+      function               = var.identity_provider_lambda_arn
     }
   }
 

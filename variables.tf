@@ -99,14 +99,3 @@ variable "identity_provider_lambda_arn" {
   }
 }
 
-variable "identity_provider_invocation_role" {
-  description = "ARN of the IAM role that AWS Transfer uses to invoke the Lambda function"
-  type        = string
-  default     = null
-
-  validation {
-    condition     = var.identity_provider_type != "AWS_LAMBDA" || var.identity_provider_invocation_role != null
-    error_message = "When identity_provider_type is AWS_LAMBDA, identity_provider_invocation_role must be provided."
-  }
-}
-
