@@ -29,6 +29,7 @@ resource "aws_transfer_server" "default" {
   count = local.enabled ? 1 : 0
 
   identity_provider_type = var.identity_provider_type
+  function               = var.identity_provider_type == "AWS_LAMBDA" ? var.identity_provider_lambda_arn : null
   protocols              = ["SFTP"]
   domain                 = var.domain
   endpoint_type          = local.is_vpc ? "VPC" : "PUBLIC"
@@ -44,14 +45,6 @@ resource "aws_transfer_server" "default" {
       security_group_ids     = var.vpc_security_group_ids
       vpc_id                 = var.vpc_id
       address_allocation_ids = var.eip_enabled ? aws_eip.sftp.*.id : var.address_allocation_ids
-    }
-  }
-
-  dynamic "identity_provider_details" {
-    for_each = var.identity_provider_type == "AWS_LAMBDA" ? [1] : []
-
-    content {
-      function               = var.identity_provider_lambda_arn
     }
   }
 
